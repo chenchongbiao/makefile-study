@@ -189,7 +189,7 @@ export variable
 
 ## 指定头文件路径
 
-一般都是通过"-I"（大写i）来指定，假设头文件在：
+通过"-I"（大写i）来指定，假设头文件在：
 
 ```bash
 /home/develop/include
@@ -206,4 +206,33 @@ export variable
 
 ```bash
 CFLAGS=-I/home/develop/include
+```
+
+然后在编译的时候，引用CFLAGS即可，如下
+
+```makefile
+app:*.c
+    gcc $(CFLAGS) -o app
+```
+
+## 指定库文件路径
+
+指定库文件使用的是"-L"来指定
+
+```makefile
+LDFLAGS=-L/usr/lib -L/path/to/your/lib
+```
+
+告诉链接器要链接哪些库文件，使用"-l"（小写L）如下：
+
+```makefile
+LIBS = -lpthread -liconv
+```
+
+# 操作
+
+主Makefile执行操作
+
+```bash
+make
 ```
