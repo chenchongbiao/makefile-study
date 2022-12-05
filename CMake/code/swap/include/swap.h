@@ -1,4 +1,4 @@
-#pragma once
+#pragma once // 防止头文件重复包含
 #include <iostream>
 
 class swap
@@ -11,6 +11,6 @@ public:
     void run();
     void printInfo();
 private:
-    int _a;
+    int _a;   
     int _b;
 };
