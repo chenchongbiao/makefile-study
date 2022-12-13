@@ -580,6 +580,12 @@ target_include_directories(projectA ./include1) # 注意当前CMakeLists.txt与i
 add_executable(projectA main.cpp)
 ```
 
+- include_directories与target_include_directories区别
+
+> include_directories 会为当前CMakeLists.txt的所有目标，以及之后添加的所有子目录的目标添加头文件搜索路径。因此，慎用include_directories，因为会影响全局target。
+
+> target_include_directories 只会为指定目标包含头文件搜索路径。如果想为不同目标设置不同的搜索路径，那么用target_include_directories更合适。
+
 #### link_directories
 
 - 向工程添加多个特定的库文件搜索路径 --->相当于指定g++编译器的-L参数
