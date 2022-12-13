@@ -509,7 +509,9 @@ ADD_EXECUTABLE(hello main.cpp ${HELLO})
 
 ### 重要指令
 
-cmake_minimum_required - 指定CMake的最小版本要求
+#### cmake_minimum_required
+
+- 指定CMake的最小版本要求
 
 语法： cmake_minimum_required(VERSION versionNumber [FATAL_ERROR])
 
@@ -518,7 +520,9 @@ cmake_minimum_required - 指定CMake的最小版本要求
 cmake_minimum_required(VERSION 2.8.3)
 ```
 
-project - 定义工程名称，并可指定工程支持的语言
+#### project
+
+- 定义工程名称，并可指定工程支持的语言
 
 语法： project(projectname [CXX] [C] [Java])
 
@@ -527,7 +531,9 @@ project - 定义工程名称，并可指定工程支持的语言
 project(HELLOWORLD)
 ```
 
-set - 显式的定义变量
+#### set
+
+- 显式的定义变量
 
 语法：set(VAR [VALUE] [CACHE TYPE DOCSTRING [FORCE]])
 
@@ -536,7 +542,9 @@ set - 显式的定义变量
 set(SRC sayhello.cpp hello.cpp)
 ```
 
-include_directories - 向工程添加多个特定的头文件搜索路径 --->相当于指定g++编译器的-I参数
+#### include_directories
+
+- 向工程添加多个特定的头文件搜索路径 --->相当于指定g++编译器的-I参数
 
 语法： include_directories([AFTER|BEFORE] [SYSTEM] dir1 dir2 ...)
 
@@ -545,7 +553,36 @@ include_directories - 向工程添加多个特定的头文件搜索路径 --->�
 include_directories(/usr/include/myincludefolder ./include)
 ```
 
-link_directories - 向工程添加多个特定的库文件搜索路径 --->相当于指定g++编译器的-L参数
+#### target_include_directories
+
+- 为指定目标（target）添加搜索路径，指定目标是指通过如add_executable()，add_library()这样的命令生成的，并且决不能是alias target（引用目标，别名目标）
+
+语法：target_include_directories(`<target>` [SYSTEM] [AFTER|BEFORE]  <INTERFACE|PUBLIC|PRIVATE> [items1...]  [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...])
+
+- AFTER或BEFORE
+
+    可以选择让添加的路径位于搜索列表的开头或结尾。缺省时，默认是AFTER。
+
+- INTERFACE，PUBLIC，PRIVATE
+
+    指定接下来的参数item（即路径）的作用域：
+
+> INTERFACE target对应的头文件才能使用，会指定target的属性INTERFACE_INCLUDE_DIRECTORIES
+
+> PUBLIC target对应头文件和源文件都能使用，会指定target的属性INCLUDE_DIRECTORIES 和INTERFACE_INCLUDE_DIRECTORIES
+
+> PRIVATE target对应源文件使用，会指定target的属性INCLUDE_DIRECTORIES
+
+```bash
+# 单独为目标projectA添加搜索路径include1。
+target_include_directories(projectA ./include1) # 注意当前CMakeLists.txt与include1路径的相对位置关系
+
+add_executable(projectA main.cpp)
+```
+
+#### link_directories
+
+- 向工程添加多个特定的库文件搜索路径 --->相当于指定g++编译器的-L参数
 
 语法： link_directories(dir1 dir2 ...)
 
@@ -554,7 +591,20 @@ link_directories - 向工程添加多个特定的库文件搜索路径 --->相�
 link_directories(/usr/lib/mylibfolder ./lib)
 ```
 
-add_library - 生成库文件
+#### target_link_libraries
+
+- 为 target 添加需要链接的共享库 --->相同于指定g++编译器-l参数
+
+语法： target_link_libraries(target library1<debug | optimized> library2...)
+
+```bash
+# 将hello动态库文件链接到可执行文件main
+target_link_libraries(main hello)
+```
+
+#### add_library
+
+- 生成库文件
 
 语法： add_library(libname [SHARED|STATIC|MODULE] [EXCLUDE_FROM_ALL]
 
@@ -565,7 +615,9 @@ source1 source2 ... sourceN)
 add_library(hello SHARED ${SRC})
 ```
 
-add_compile_options - 添加编译参数
+#### add_compile_options
+
+- 添加编译参数
 
 语法：add_compile_options
 
@@ -574,7 +626,9 @@ add_compile_options - 添加编译参数
 add_compile_options(-Wall -std=c++11 -O2)
 ```
 
-add_executable - 生成可执行文件
+#### add_executable
+
+- 生成可执行文件
 
 语法：add_executable(exename source1 source2 ... sourceN)
 
@@ -583,16 +637,9 @@ add_executable - 生成可执行文件
 add_executable(main main.cpp)
 ```
 
-target_link_libraries - 为 target 添加需要链接的共享库 --->相同于指定g++编译器-l参数
+#### add_subdirectory
 
-语法： target_link_libraries(target library1<debug | optimized> library2...)
-
-```bash
-# 将hello动态库文件链接到可执行文件main
-target_link_libraries(main hello)
-```
-
-add_subdirectory - 向当前工程添加存放源文件的子目录，并可以指定中间二进制和目标二进制
+- 向当前工程添加存放源文件的子目录，并可以指定中间二进制和目标二进制
 
 存放的位置
 
@@ -603,7 +650,9 @@ add_subdirectory - 向当前工程添加存放源文件的子目录，并可以�
 add_subdirectory(src)
 ```
 
-aux_source_directory - 发现一个目录下所有的源代码文件并将列表存储在一个变量中，这个指
+#### aux_source_directory
+
+- 发现一个目录下所有的源代码文件并将列表存储在一个变量中，这个指
 
 令临时被用来自动构建源文件列表
 
