@@ -854,7 +854,7 @@ install(CODE "MESSAGE(\"Sample install message.\")")
 
 #### cmake_parse_arguments
 
-参考：[cmake_parse_arguments详解]()
+参考：[cmake_parse_arguments详解](https://blog.csdn.net/weixin_39766005/article/details/123378761)
 
 使用cmake_parse_arguments可以定义一个带有命名参数的函数或宏。
 
