@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.2)
 project(install-export-demo C)
 
 #设置install目录
-set(CMAKE_INSTALL_PREFIX /home/user/win_samba/Demo4/build/install)
+set(CMAKE_INSTALL_PREFIX /home/bluesky/QtProject/makefile-study/build/install)
 #提供GNU编码标准定义的安装目录变量
 include(GNUInstallDirs)
 
