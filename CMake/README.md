@@ -879,6 +879,15 @@ install(EXPORT <export_name> …) 命令会生成两个文件—— <export_name
 
 #### configure_file
 
+该命令将 指定的文件拷贝为 指定的文件，并将 文件中 @VAR@ 或 ${VAR} 的位置替换为使用 configure_file()
+命令的当前 CMakeLists.txt 中变量 VAR 的值。该命令用于外部文件获取 CMakeLists.txt 文件中变量的值。
+
+注意：
+
+```
+configure_file( <output) 中的 指定的文件名必须是 xxxConfig.cmake 或 xxx-config.cmake（xxx必须为小写）。
+xxx.cmake 文件的安装路径中可以没有 cmake/ 这一级目录。如果有，那么cmake 必须为小写。例程中${CMAKE_INSTALL_FULL_LIBDIR}/cmake/testHello 可以改为 ${CMAKE_INSTALL_FULL_LIBDIR}/testHello，但是不能写成 ${CMAKE_INSTALL_FULL_LIBDIR}/Cmake/testHello。
+```
 
 #### cmake_parse_arguments
 
@@ -941,7 +950,6 @@ add_catch_test(
   )
 ```
 
-
 ### CMake常用变量
 
 #### CMAKE_C_FLAGS gcc编译选项
@@ -995,7 +1003,6 @@ set(CMAKE_BUILD_TYPE Release)
 #### EXECUTABLE_OUTPUT_PATH：可执行文件输出的存放路径
 
 #### LIBRARY_OUTPUT_PATH：库文件输出的存放路径
-
 
 ## CMake编译工程
 
