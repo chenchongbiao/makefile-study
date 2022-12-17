@@ -700,7 +700,7 @@ install(EXPORT <export-name> [...])
 
 有时候，也会用到一个非常有用的变量 `CMAKE_INSTALL_PREFIX`， **用于指定cmake install时的相对地址前缀** 。用法如：
 
-```
+```cmake
 cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 ```
 
@@ -717,7 +717,7 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 
 为了符合一般的默认安装路径，如果设置了 `DESTINATION`参数，推荐配置在安装目录变量下的文件夹。
 
-```bash
+```cmake
 INSTALL(TARGETS myrun mylib mystaticlib
        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -742,7 +742,7 @@ INSTALL(TARGETS myrun mylib mystaticlib
 
 注意一下 `CONFIGURATIONS`参数， **此选项指定的值仅适用于此选项之后列出的选项** ：例如，要为调试和发布配置设置单独的安装路径，请执行以下操作：
 
-```bash
+```cmake
 install(TARGETS target
         CONFIGURATIONS Debug
         RUNTIME DESTINATION Debug/bin)
@@ -755,7 +755,7 @@ install(TARGETS target
 
 ##### 普通文件的安装
 
-```bash
+```cmake
 install(<FILES|PROGRAMS> files...
         TYPE <type> | DESTINATION <dir>
         [PERMISSIONS permissions...]
@@ -800,7 +800,7 @@ FILES|PROGRAMS若为相对路径给出的文件名，将相对于当前源目录
 
 ##### 目录的安装
 
-```bash
+```cmake
 install(DIRECTORY dirs...
         TYPE <type> | DESTINATION <dir>
         [FILE_PERMISSIONS permissions...]
@@ -823,7 +823,7 @@ FILE_PERMISSIONS和DIRECTORY_PERMISSIONS选项指定对目标中文件和目录�
 某些跟随PATTERN或REGEX表达式后的参数，仅应用于满足表达式的文件或目录。如：EXCLUDE选项将跳过匹配的文件或目录。PERMISSIONS选项将覆盖匹配文件或目录的权限设置。
 例如：
 
-```bash
+```cmake
 install(DIRECTORY icons scripts/ DESTINATION share/myproj
         PATTERN "CVS" EXCLUDE
         PATTERN "scripts/*"
@@ -837,7 +837,7 @@ install(DIRECTORY icons scripts/ DESTINATION share/myproj
 
 有时候需要在 `install`的过程中打印一些语句，或者执行一些 `cmake`指令：
 
-```bash
+```cmake
 install([[SCRIPT <file>] [CODE <code>]]
         [COMPONENT <component>] [EXCLUDE_FROM_ALL] [...])
 ```
@@ -846,11 +846,39 @@ install([[SCRIPT <file>] [CODE <code>]]
 
 例如：
 
-```bash
+```cmake
 install(CODE "MESSAGE(\"Sample install message.\")")
 ```
 
 这条命令将会在 `install`的过程中执行 `cmake`代码，打印语句。
+
+##### 导出信息
+
+代码：code/cmake-install-export
+
+该命令的基本功能是将指定文件安装（拷贝）到指定目录。和我们主题相关的是 EXPORT
+
+```cmake
+install(TARGETS target EXPORT <export_name>) 和 
+
+install(EXPORT <export_name> DESTINATION … FILE .cmake)。
+```
+
+```cmake
+install(TARGETS targets EXPORT <export_name>)
+将目标文件 targets 的可导出信息存储在 <export_name> 中，用于生成可导出文件。
+install(EXPORT <export_name> DESTINATION
+FILE .cmake)
+将 [1] 中产生的 <export_name> 存储在 .cmake文件中，并将 .cmake 安装到
+。如果没有指定 .cmake，那么就存储在 <export_name>.cmake 文件中。 
+```
+
+install(EXPORT <export_name> …) 命令会生成两个文件—— <export_name>.cmake 和 <export_name>-noconfig.cmake。其中，<export_name>.cmake 会被 configure_file(…) 中 指定的文件使用。而 <export_name>-noconfig.cmake 会被 <export_name>.cmake 文件使用。
+
+<export_name>-noconfig.cmake 中的 noconfig 是什么？指的是 CMAKE_BUILD_TYPE 的值。如果使用 cmake 生成编译系统时指定了 CMAKE_BUILD_TYPE=debug，那么生成的就会是 <export_name>-debug.cmake。
+
+#### configure_file
+
 
 #### cmake_parse_arguments
 
@@ -860,12 +888,12 @@ install(CODE "MESSAGE(\"Sample install message.\")")
 
 ##### 参数解析
 
-```bash
+```cmake
 cmake_parse_arguments(<prefix> <options> <one_value_keywords>
                       <multi_value_keywords> <args>...)
 ```
 
-```bash
+```cmake
 <prefix>前缀：解析出的参数都会按照prefix_参数名的形式形成新的变量。这些变量将保存参数列表中的相应值，如果找不到相关选项，则这些变量将是未定义的。
 <options>可选值：无论选项是否在参数列表中，它们都将被定义为TRUE或FALSE（选项在参数中为true）。
 <one_value_keywords>: 单值关键词列表，每个关键词仅仅对应一个值。
@@ -967,6 +995,7 @@ set(CMAKE_BUILD_TYPE Release)
 #### EXECUTABLE_OUTPUT_PATH：可执行文件输出的存放路径
 
 #### LIBRARY_OUTPUT_PATH：库文件输出的存放路径
+
 
 ## CMake编译工程
 
