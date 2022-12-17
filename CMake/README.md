@@ -852,6 +852,68 @@ install(CODE "MESSAGE(\"Sample install message.\")")
 
 这条命令将会在 `install`的过程中执行 `cmake`代码，打印语句。
 
+#### cmake_parse_arguments
+
+参考：[cmake_parse_arguments详解]()
+
+使用cmake_parse_arguments可以定义一个带有命名参数的函数或宏。
+
+##### 参数解析
+
+```bash
+cmake_parse_arguments(<prefix> <options> <one_value_keywords>
+                      <multi_value_keywords> <args>...)
+```
+
+```bash
+<prefix>前缀：解析出的参数都会按照prefix_参数名的形式形成新的变量。这些变量将保存参数列表中的相应值，如果找不到相关选项，则这些变量将是未定义的。
+<options>可选值：无论选项是否在参数列表中，它们都将被定义为TRUE或FALSE（选项在参数中为true）。
+<one_value_keywords>: 单值关键词列表，每个关键词仅仅对应一个值。
+<multi_value_keywords>: 多值关键词列表，每个关键词可对应多个值。
+<args>...参数： 一般传入${ARGN}即可。
+```
+
+##### 命令应用
+
+###### 定义函数
+
+我们使用函数名( add_catch_test )选项(none)、单值参数( NAME 和 COST )和多值参数( LABELS 、 DEPENDS 和 REFERENCE_FILES )调用cmake_parse_arguments命令。
+
+```bash
+function(add_catch_test)
+  set(options)
+  set(oneValueArgs NAME COST)
+  set(multiValueArgs LABELS DEPENDS REFERENCE_FILES)
+  cmake_parse_arguments(add_catch_test
+    "${options}"
+    "${oneValueArgs}"
+    "${multiValueArgs}"
+    ${ARGN}
+    )
+  message(STATUS "defining a test ...")
+  message(STATUS "    NAME: ${add_catch_test_NAME}")
+  message(STATUS "    LABELS: ${add_catch_test_LABELS}")
+  message(STATUS "    COST: ${add_catch_test_COST}")
+  message(STATUS "    REFERENCE_FILES: ${add_catch_test_REFERENCE_FILES}")
+  ...
+endfunction()
+```
+
+###### 函数调用
+
+```
+add_catch_test(
+  NAME
+    short
+  LABELS
+    short
+    cpp_test
+  COST
+    1.5
+  )
+```
+
+
 ### CMake常用变量
 
 #### CMAKE_C_FLAGS gcc编译选项
