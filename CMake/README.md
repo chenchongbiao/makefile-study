@@ -854,6 +854,8 @@ install(CODE "MESSAGE(\"Sample install message.\")")
 
 ##### 导出信息
 
+参考：[CMake生成库和intall文件](https://blog.csdn.net/DynastyDoubleH/article/details/123007508)
+
 代码：code/cmake-install-export
 
 该命令的基本功能是将指定文件安装（拷贝）到指定目录。和我们主题相关的是 EXPORT
@@ -884,9 +886,14 @@ install(EXPORT <export_name> …) 命令会生成两个文件—— <export_name
 
 注意：
 
-```
-configure_file( <output) 中的 指定的文件名必须是 xxxConfig.cmake 或 xxx-config.cmake（xxx必须为小写）。
-xxx.cmake 文件的安装路径中可以没有 cmake/ 这一级目录。如果有，那么cmake 必须为小写。例程中${CMAKE_INSTALL_FULL_LIBDIR}/cmake/testHello 可以改为 ${CMAKE_INSTALL_FULL_LIBDIR}/testHello，但是不能写成 ${CMAKE_INSTALL_FULL_LIBDIR}/Cmake/testHello。
+```cmake
+configure_file( <output) 中的 指定的文件名必须是 xxxConfig.cmake 或 
+xxx-config.cmake（xxx必须为小写）。
+xxx.cmake 文件的安装路径中可以没有 cmake/ 这一级目录。如果有，那么cmake 必须为小写。
+例程中
+${CMAKE_INSTALL_FULL_LIBDIR}/cmake/testHello 
+可以改为 ${CMAKE_INSTALL_FULL_LIBDIR}/testHello，
+但是不能写成 ${CMAKE_INSTALL_FULL_LIBDIR}/Cmake/testHello。
 ```
 
 #### cmake_parse_arguments
