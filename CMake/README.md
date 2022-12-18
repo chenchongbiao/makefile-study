@@ -804,7 +804,6 @@ arg = abc
 
 从这里可以看出， 宏实现的仅仅是字符串替换，宏定义的过程中是无法进行修改的，而函数却是可以的 。
 
-
 #### install
 
 参考链接：[cmake的install指令](https://blog.csdn.net/qq_38410730/article/details/102837401)
@@ -1016,13 +1015,13 @@ install(EXPORT <export_name> …) 命令会生成两个文件—— <export_name
 
 #### configure_file
 
+代码：code/configure-file
+
 ```cmake
 configure_file(<input> <output>
                [COPYONLY] [ESCAPE_QUOTES] [@ONLY]
                [NEWLINE_STYLE [UNIX|DOS|WIN32|LF|CRLF] ])
 ```
-
-
 
 官方CMake教程对它的解释是：将文件复制到另一个位置并修改其内容。
 
@@ -1060,13 +1059,126 @@ set(BUILD_Version 1)
 #define BUILD_Version 1
 ```
 
-那么，在输出文件中就会被转化为：
+顺便，看一下configure_file的其他选项：
 
 ```cmake
-#define BUILD_Version 1
+COPYONLY：只拷贝文件，不进行任何的变量替换。这个选项在指定了NEWLINE_STYLE选项时不能使用（无效）。
+ESCAPE_QUOTES：躲过任何的反斜杠(C风格)转义。
+@ONLY：限制变量替换，让其只替换被@VAR@引用的变量(那么${VAR}格式的变量将不会被替换)。这在配置${VAR}语法的脚本时是非常有用的。
+NEWLINE_STYLE style：指定输出文件中的新行格式。UNIX和LF的新行是\n，DOS和WIN32和CRLF的新行格式是\r\n。这个选项在指定了COPYONLY选项时不能使用(无效)。
 ```
 
+通常情况下， **输入文件以.h.in为后缀，输出文件以.h为后缀** 。
 
+##### 实例
+
+实例内容：在CMakeLists.txt中指定版本号、自动获取Git的分支和hash号、自动获取编译时间，并将这些信息写入到可执行程序中打印出来。
+
+编写 `utils.cmake`，定义 `macro`宏，用于获取Git的hash值和分支：
+
+```cmake
+# get git hash
+macro(get_git_hash _git_hash)   # 宏的开始
+    find_package(Git QUIET)     # 查找Git，QUIET静默方式不报错
+    if(GIT_FOUND)
+      execute_process(          # 执行一个子进程
+        COMMAND ${GIT_EXECUTABLE} log -1 --pretty=format:%h # 命令
+        OUTPUT_VARIABLE ${_git_hash}        # 输出字符串存入变量
+        OUTPUT_STRIP_TRAILING_WHITESPACE    # 删除字符串尾的换行符
+        ERROR_QUIET                         # 对执行错误静默
+        WORKING_DIRECTORY                   # 执行路径
+          ${CMAKE_CURRENT_SOURCE_DIR}
+        )
+    endif()
+endmacro()                      # 宏的结束
+
+# get git branch
+macro(get_git_branch _git_branch)   # 宏的开始
+    find_package(Git QUIET)     # 查找Git，QUIET静默方式不报错
+    if(GIT_FOUND)
+      execute_process(          # 执行一个子进程
+        COMMAND ${GIT_EXECUTABLE} symbolic-ref --short -q HEAD
+        OUTPUT_VARIABLE ${_git_branch}        # 输出字符串存入变量
+        OUTPUT_STRIP_TRAILING_WHITESPACE    # 删除字符串尾的换行符
+        ERROR_QUIET                         # 对执行错误静默
+        WORKING_DIRECTORY                   # 执行路径
+          ${CMAKE_CURRENT_SOURCE_DIR}
+        )
+    endif()
+endmacro()                      # 宏的结束
+```
+
+编写CMakeLists.txt，定义编译时间戳变量、版本变量、Git信息变量，同时实现编译可执行程序、复制文件和变换变量：
+
+```cmake
+cmake_minimum_required(VERSION 3.0)
+include(cmake/utils.cmake)
+project(main)
+
+string(TIMESTAMP BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
+message("Build timestamp is ${BUILD_TIMESTAMP}")
+
+set(VERSION_MAJOR 0)
+set(VERSION_MINOR 0)
+set(VERSION_PATCH 1)
+message("Version is ${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_PATCH}")
+
+set(GIT_HASH "")
+get_git_hash(GIT_HASH)
+message("Git hash is ${GIT_HASH}")
+
+set(GIT_BRANCH "")
+get_git_branch(GIT_BRANCH)
+message("Git branch is ${GIT_BRANCH}")
+
+configure_file (
+    "${PROJECT_SOURCE_DIR}/include/utils.h.in"
+    "${PROJECT_SOURCE_DIR}/include/utils.h"
+)
+
+add_executable(${PROJECT_NAME} src/main.cc)
+
+include_directories(
+    ${PROJECT_SOURCE_DIR}/include
+)
+
+install(TARGETS ${PROJECT_NAME}
+    RUNTIME DESTINATION ${PROJECT_SOURCE_DIR})
+```
+
+configure_file的输入文件：
+
+```cpp
+#ifndef UTILS_H_IN
+#define UTILS_H_IN
+
+#define VERSION_MAJOR @VERSION_MAJOR@
+#define VERSION_MINOR @VERSION_MINOR@
+#define VERSION_PATCH @VERSION_PATCH@
+
+#define BUILD_TIMESTAMP "@BUILD_TIMESTAMP@"
+
+#define GIT_BRANCH "@GIT_BRANCH@"
+#define GIT_HASH "@GIT_HASH@"
+
+#endif // UTILS_H_IN
+```
+
+主程序为：
+
+```cpp
+#include "utils.h"
+#include <iostream>
+
+int main(int argc, char const *argv[])
+{
+  std::cout << "version is " << VERSION_MAJOR << ", " << VERSION_MINOR << ", "<< VERSION_PATCH << std::endl;
+  std::cout << "timestamp is " << BUILD_TIMESTAMP << std::endl;
+  std::cout << "git is " << GIT_BRANCH << ", " << GIT_HASH << std::endl;
+  
+  return 0;
+}
+```
 
 #### cmake_parse_arguments
 
