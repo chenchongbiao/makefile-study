@@ -1350,6 +1350,18 @@ add_catch_test(
   )
 ```
 
+```cmake
+在cmake_parse_arguments调用后，将设置或取消定义以下变量：
+    add_catch_test_NAME：short
+    add_catch_test_COST：1.5
+    add_catch_test_LABELS：short;cpp_test
+    add_catch_test_DEPENDS
+    add_catch_test_REFERENCE_FILES
+    add_catch_test_OPTIONAL
+    add_catch_test_UNPARSED_ARGUMENTS：表示未被使用的参数变量（ ${ARGN}里面）
+    add_catch_test_KEYWORDS_MISSING_VALUES：定义了关键词，但是没有对应的值。
+```
+
 ### CMake常用变量
 
 #### CMAKE_C_FLAGS gcc编译选项
